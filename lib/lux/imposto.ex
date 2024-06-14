@@ -39,22 +39,32 @@ defmodule Lux.Imposto do
         "_gali=btnESModal3"
       ] |> Enum.join("; ")
 
-      get("/icms-pis-e-cofins/", headers: [{"Cookie", cookies}])
+      {:ok, %Tesla.Env{body: body}} = get("/icms-pis-e-cofins/", headers: [{"Cookie", cookies}])
+      {:ok, html_parsed} = Floki.parse_document(body)
+      html_parsed
     end
 
     def get_tax do
-      {:ok, %Tesla.Env{body: body}} = get_page()
-      body
-      |> Floki.parse_document(body)
-      |> Floki.find("table tr")
-      |> Enum.map(fn tr ->
-        [
-          Floki.find(tr, "td:nth-child(1)"),
-          Floki.find(tr, "td:nth-child(2)"),
-          Floki.find(tr, "td:nth-child(3)"),
-          Floki.find(tr, "td:nth-child(4)")
-        ]
+
+      get_page()
+      |> Floki.find("tbody tr")
+      |> IO.inspect()
+      |> Enum.map(fn row ->
+        Floki.find(row, "td")
         |> Enum.map(&Floki.text/1)
+        |> Enum.map(&String.trim/1)
+      end)
+    end
+
+    def tax_per_year do
+      get_tax()
+      |> Enum.map(fn [year, icms, pis, cofins] ->
+        %{
+          year: year,
+          icms: icms,
+          pis: pis,
+          cofins: cofins
+        }
       end)
     end
 
