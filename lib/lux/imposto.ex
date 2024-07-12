@@ -45,15 +45,14 @@ defmodule Lux.Imposto do
     end
 
     def get_tax do
-
       get_page()
       |> Floki.find("tbody tr")
-      |> IO.inspect()
       |> Enum.map(fn row ->
         Floki.find(row, "td")
         |> Enum.map(&Floki.text/1)
         |> Enum.map(&String.trim/1)
       end)
+      |> DataCleaner.clean_data()
     end
 
     def tax_per_year do
