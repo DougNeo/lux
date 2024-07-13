@@ -17,10 +17,10 @@ defmodule DataCleaner do
   def clean_data(data) do
     data
     |> upcase_tabela()
-    |> trim_space
+    |> trim_space()
+    |> trim_space_invisible()
     |> remove_headers()
     |> Enum.map(&process_row/1)
-    # |> IO.inspect()
   end
 
   defp upcase_tabela(data) do
@@ -31,8 +31,8 @@ defmodule DataCleaner do
     Enum.map(data, fn linha -> Enum.map(linha, fn item -> String.replace(item, " ", "") end) end)
   end
 
-  defp trim_space_invisible(data) do
-    Enum.map(data, fn linha -> Enum.map(linha, fn item -> String.replace(item, ~r/\u200B/, "") end) end)
+  def trim_space_invisible(data) do
+    Enum.map(data, fn linha -> Enum.map(linha, fn item -> String.replace(item, "\u200B", "") end) end)
   end
 
   def remove_headers(data) do
