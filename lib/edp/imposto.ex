@@ -45,14 +45,12 @@ defmodule Edp.Imposto do
   def get_pis_pasep_cofins do
     get_page()
     |> validate_estrutura("Tabela PIS COFINS")
-    # |> Floki.find("#estrutura-de-conteudo-10077225")
     |> Floki.find("tbody tr")
     |> Enum.map(fn row ->
       Floki.find(row, "td")
       |> Enum.map(&Floki.text/1)
       |> Enum.map(&String.trim/1)
     end)
-    |> IO.inspect()
     |> Edp.DataCleaner.clean_data()
   end
 
