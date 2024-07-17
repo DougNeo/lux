@@ -1,4 +1,4 @@
-defmodule DataCleaner do
+defmodule Edp.DataCleaner do
   @month_translation %{
     "JANEIRO" => "JANUARY",
     "FEVEREIRO" => "FEBRUARY",
@@ -31,25 +31,23 @@ defmodule DataCleaner do
     Enum.map(data, fn linha -> Enum.map(linha, fn item -> String.replace(item, " ", "") end) end)
   end
 
-  def trim_space_invisible(data) do
+  defp trim_space_invisible(data) do
     Enum.map(data, fn linha -> Enum.map(linha, fn item -> String.replace(item, "\u200B", "") end) end)
   end
 
-  def remove_headers(data) do
+  defp remove_headers(data) do
     header = hd(data)
     [_hd | sem_hd] = [header | Enum.filter(tl(data), &(&1 != header))]
     sem_hd
   end
 
-  def process_row([month_year | rest]) do
-    IO.inspect([month_year | rest])
+  defp process_row([month_year | rest]) do
     [convert_to_date(month_year) | Enum.map(rest, &convert_to_float/1)]
   end
 
-  def convert_to_date(month_year) do
+  defp convert_to_date(month_year) do
     [month_pt, year] = String.split(month_year, "/")
     month_en = Map.get(@month_translation, month_pt)
-    IO.inspect(month_en)
     {:ok, date} = Date.from_iso8601("#{year}-#{month_to_number(month_en)}-01")
     date
   end
